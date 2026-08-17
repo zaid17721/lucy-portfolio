@@ -17,7 +17,6 @@ function App() {
         <nav className="navbar">
           <a href="#home" className="logo">
             <span className="logo-full">LUCY.</span>
-            <span className="logo-mark">L.</span>
           </a>
 
           <div className="nav-links">
@@ -60,17 +59,43 @@ function App() {
           </div>
         </section>
 
-        {/* FEATURED WORK */}
-        <section className="featured-section">
-          <div className="section-heading">
-            <p className="eyebrow">SELECTED</p>
-            <h2>Featured work</h2>
-          </div>
+{/* FEATURED WORK */}
+<section className="featured-section" id="featured">
+  <div className="section-heading">
+    <p className="eyebrow">SELECTED</p>
+    <h2>Featured work</h2>
+  </div>
 
-          <div className="featured-placeholder">
-            Featured projects will appear here.
-          </div>
-        </section>
+  <article className="featured-project">
+    <div className="featured-media">
+      <div className="featured-media-label">
+        FEATURED PROJECT
+      </div>
+    </div>
+
+    <div className="featured-info">
+      <div className="featured-copy">
+        <p className="featured-category">
+          VIDEO EDITING
+        </p>
+
+        <h3>
+          Your featured project
+        </h3>
+
+        <p className="featured-description">
+          A selected edit showcasing storytelling, pacing
+          and visual direction.
+        </p>
+      </div>
+
+      <div className="featured-meta">
+        <span>01</span>
+        <span>View project ↗</span>
+      </div>
+    </div>
+  </article>
+</section>
 
         {/* WORK */}
         <section id="work" className="work-section">
