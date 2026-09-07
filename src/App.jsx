@@ -53,9 +53,6 @@ const projects = [
 
 /* =========================================================
    TESTIMONIALS
-
-   These are temporary examples.
-   Later these can come from the CMS.
 ========================================================= */
 
 const testimonials = [
@@ -101,6 +98,68 @@ const testimonials = [
    APP
 ========================================================= */
 
+
+/* =========================================================
+   HERO VISUAL
+   Decorative animation for the empty right side of Home.
+   No text is used inside the animation.
+========================================================= */
+
+function HeroVisual() {
+  const frames = [
+    { className: 'hero-frame hero-frame-1', variant: 'one' },
+    { className: 'hero-frame hero-frame-2', variant: 'two' },
+    { className: 'hero-frame hero-frame-3', variant: 'three' },
+    { className: 'hero-frame hero-frame-4', variant: 'four' },
+    { className: 'hero-frame hero-frame-5', variant: 'five' },
+  ]
+
+  return (
+    <div className="hero-visual" aria-hidden="true">
+      <div className="hero-visual-glow" />
+
+      <div className="hero-orbit hero-orbit-horizontal" />
+      <div className="hero-orbit hero-orbit-diagonal" />
+      <div className="hero-orbit hero-orbit-vertical" />
+
+      <div className="hero-axis hero-axis-x" />
+      <div className="hero-axis hero-axis-y" />
+
+      <div className="hero-center">
+        <span className="hero-center-glow" />
+        <span className="hero-center-core" />
+      </div>
+
+      <div className="hero-frame-stage">
+        {frames.map(frame => (
+          <div
+            key={frame.className}
+            className={frame.className}
+          >
+            <div className={`hero-frame-art hero-frame-art-${frame.variant}`}>
+              <span className="hero-frame-light" />
+              <span className="hero-frame-shape hero-frame-shape-a" />
+              <span className="hero-frame-shape hero-frame-shape-b" />
+              <span className="hero-frame-shape hero-frame-shape-c" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hero-particles">
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+    </div>
+  )
+}
+
 function App() {
 
   /* =======================================================
@@ -109,6 +168,12 @@ function App() {
 
   const [activeFilter, setActiveFilter] = useState('All')
 
+
+  /* =======================================================
+     THEME
+  ======================================================= */
+
+  const [lightTheme, setLightTheme] = useState(false)
 
   /* =======================================================
      TESTIMONIAL CAROUSEL
@@ -125,9 +190,6 @@ function App() {
   const [step, setStep] = useState(0)
 
   const carouselViewportRef = useRef(null)
-
-  const carouselTrackRef = useRef(null)
-
   const cardRef = useRef(null)
 
 
@@ -136,9 +198,7 @@ function App() {
   ======================================================= */
 
   useEffect(() => {
-
     const updateVisibleCards = () => {
-
       if (window.innerWidth <= 700) {
         setVisibleCards(1)
         return
@@ -152,7 +212,6 @@ function App() {
       setVisibleCards(3)
     }
 
-
     updateVisibleCards()
 
     window.addEventListener(
@@ -160,31 +219,20 @@ function App() {
       updateVisibleCards
     )
 
-
     return () => {
       window.removeEventListener(
         'resize',
         updateVisibleCards
       )
     }
-
   }, [])
 
 
   /* =======================================================
-     CLONES
-
-     Example with 3 visible cards:
-
-     [3][4][5]
-     [1][2][3][4][5]
-     [1][2][3]
-
-     This allows us to loop forever.
+     TESTIMONIAL CLONES
   ======================================================= */
 
   const clonedTestimonials = useMemo(() => {
-
     const clones = visibleCards
 
     return [
@@ -192,70 +240,49 @@ function App() {
       ...testimonials,
       ...testimonials.slice(0, clones),
     ]
-
   }, [visibleCards])
 
 
   /* =======================================================
-     RESET INDEX WHEN CARD COUNT CHANGES
+     RESET CAROUSEL ON RESIZE
   ======================================================= */
 
   useEffect(() => {
-
     setIsAnimating(false)
-
     setCurrentIndex(testimonials.length)
 
     requestAnimationFrame(() => {
-
       requestAnimationFrame(() => {
         setIsAnimating(true)
       })
-
     })
-
   }, [visibleCards])
 
 
   /* =======================================================
-     MEASURE CARD STEP
-
-     Card width + gap.
+     MEASURE TESTIMONIAL STEP
   ======================================================= */
 
   useEffect(() => {
-
     const calculateStep = () => {
-
-      if (!cardRef.current) {
-        return
-      }
+      if (!cardRef.current) return
 
       const cardWidth =
         cardRef.current.getBoundingClientRect().width
 
       const styles =
-        window.getComputedStyle(
-          cardRef.current
-        )
+        window.getComputedStyle(cardRef.current)
 
       const marginRight =
-        parseFloat(
-          styles.marginRight
-        ) || 0
+        parseFloat(styles.marginRight) || 0
 
       setStep(cardWidth + marginRight)
     }
 
-
     calculateStep()
 
-
     const resizeObserver =
-      new ResizeObserver(
-        calculateStep
-      )
-
+      new ResizeObserver(calculateStep)
 
     if (carouselViewportRef.current) {
       resizeObserver.observe(
@@ -263,38 +290,30 @@ function App() {
       )
     }
 
-
     if (cardRef.current) {
       resizeObserver.observe(
         cardRef.current
       )
     }
 
-
     window.addEventListener(
       'resize',
       calculateStep
     )
 
-
     return () => {
-
       resizeObserver.disconnect()
 
       window.removeEventListener(
         'resize',
         calculateStep
       )
-
     }
-
   }, [visibleCards])
 
 
   /* =======================================================
      REAL TESTIMONIAL INDEX
-
-     Converts cloned index back into the real index.
   ======================================================= */
 
   const realIndex =
@@ -303,7 +322,6 @@ function App() {
       testimonials.length
     ) % testimonials.length
 
-
   const normalizedRealIndex =
     realIndex < 0
       ? realIndex + testimonials.length
@@ -311,50 +329,37 @@ function App() {
 
 
   /* =======================================================
-     NEXT
+     NEXT TESTIMONIAL
   ======================================================= */
 
   const nextTestimonial = () => {
-
-    if (!isAnimating) {
-      return
-    }
+    if (!isAnimating) return
 
     setCurrentIndex(
-      (previous) =>
-        previous + 1
+      previous => previous + 1
     )
   }
 
 
   /* =======================================================
-     PREVIOUS
+     PREVIOUS TESTIMONIAL
   ======================================================= */
 
   const previousTestimonial = () => {
-
-    if (!isAnimating) {
-      return
-    }
+    if (!isAnimating) return
 
     setCurrentIndex(
-      (previous) =>
-        previous - 1
+      previous => previous - 1
     )
   }
 
 
   /* =======================================================
-     DOT
+     GO TO TESTIMONIAL
   ======================================================= */
 
-  const goToTestimonial = (
-    index
-  ) => {
-
-    if (!isAnimating) {
-      return
-    }
+  const goToTestimonial = (index) => {
+    if (!isAnimating) return
 
     setCurrentIndex(
       testimonials.length + index
@@ -364,13 +369,9 @@ function App() {
 
   /* =======================================================
      LOOP RESET
-
-     When we reach a clone, immediately move back to
-     the corresponding real card without animation.
   ======================================================= */
 
   const handleCarouselTransitionEnd = () => {
-
     const firstRealIndex =
       testimonials.length
 
@@ -379,39 +380,27 @@ function App() {
       testimonials.length -
       visibleCards
 
-
     if (
       currentIndex >=
       testimonials.length +
       testimonials.length
     ) {
-
-      const correctedIndex =
-        testimonials.length
-
       setIsAnimating(false)
 
       setCurrentIndex(
-        correctedIndex
+        testimonials.length
       )
 
       requestAnimationFrame(() => {
-
         requestAnimationFrame(() => {
           setIsAnimating(true)
         })
-
       })
 
       return
     }
 
-
-    if (
-      currentIndex <
-      firstRealIndex
-    ) {
-
+    if (currentIndex < firstRealIndex) {
       const correctedIndex =
         testimonials.length +
         (
@@ -421,47 +410,32 @@ function App() {
 
       setIsAnimating(false)
 
-      setCurrentIndex(
-        correctedIndex
-      )
+      setCurrentIndex(correctedIndex)
 
       requestAnimationFrame(() => {
-
         requestAnimationFrame(() => {
           setIsAnimating(true)
         })
-
       })
 
       return
     }
 
-
-    if (
-      currentIndex >
-      lastRealIndex
-    ) {
-
+    if (currentIndex > lastRealIndex) {
       const correctedIndex =
         currentIndex -
         testimonials.length
 
       setIsAnimating(false)
 
-      setCurrentIndex(
-        correctedIndex
-      )
+      setCurrentIndex(correctedIndex)
 
       requestAnimationFrame(() => {
-
         requestAnimationFrame(() => {
           setIsAnimating(true)
         })
-
       })
-
     }
-
   }
 
 
@@ -473,9 +447,8 @@ function App() {
     activeFilter === 'All'
       ? projects
       : projects.filter(
-          (project) =>
-            project.category ===
-            activeFilter
+          project =>
+            project.category === activeFilter
         )
 
 
@@ -484,16 +457,19 @@ function App() {
   ======================================================= */
 
   return (
-
-    <div className="site">
-
+    <div
+      className={`site ${
+        lightTheme
+          ? 'light-theme'
+          : ''
+      }`}
+    >
 
       {/* ===================================================
           NAVIGATION
       =================================================== */}
 
       <header className="site-header">
-
         <nav className="navbar">
 
           <a
@@ -524,7 +500,7 @@ function App() {
               About
             </a>
 
-            <a href="#contact">
+            <a href="#about-contact">
               Contact
             </a>
 
@@ -535,17 +511,20 @@ function App() {
             className="theme-toggle"
             type="button"
             aria-label="Toggle theme"
+            onClick={() =>
+              setLightTheme(
+                previous => !previous
+              )
+            }
           >
             ◐
           </button>
 
         </nav>
-
       </header>
 
 
       <main>
-
 
         {/* =================================================
             HERO
@@ -589,6 +568,8 @@ function App() {
 
           </div>
 
+          <HeroVisual />
+
         </section>
 
 
@@ -627,34 +608,28 @@ function App() {
               'Information',
               'Stream Highlights',
               'Shorts',
-            ].map(
-              (filter) => (
+            ].map(filter => (
 
-                <button
-                  key={filter}
-                  type="button"
-                  role="tab"
-                  aria-selected={
-                    activeFilter ===
-                    filter
-                  }
-                  className={`category-filter ${
-                    activeFilter ===
-                    filter
-                      ? 'active'
-                      : ''
-                  }`}
-                  onClick={() =>
-                    setActiveFilter(
-                      filter
-                    )
-                  }
-                >
-                  {filter}
-                </button>
+              <button
+                key={filter}
+                type="button"
+                role="tab"
+                aria-selected={
+                  activeFilter === filter
+                }
+                className={`category-filter ${
+                  activeFilter === filter
+                    ? 'active'
+                    : ''
+                }`}
+                onClick={() =>
+                  setActiveFilter(filter)
+                }
+              >
+                {filter}
+              </button>
 
-              )
-            )}
+            ))}
 
           </div>
 
@@ -666,55 +641,48 @@ function App() {
             key={activeFilter}
           >
 
-            {filteredProjects.map(
-              (project) => (
+            {filteredProjects.map(project => (
 
-                <article
-                  className="project-card"
-                  key={project.id}
-                >
+              <article
+                className="project-card"
+                key={project.id}
+              >
 
-                  <div className="project-media">
-
-                    <span>
-                      PROJECT{' '}
-                      {String(
-                        project.id
-                      ).padStart(
-                        2,
-                        '0'
-                      )}
-                    </span>
-
-                  </div>
+                <div className="project-media">
+                  <span>
+                    PROJECT{' '}
+                    {String(
+                      project.id
+                    ).padStart(2, '0')}
+                  </span>
+                </div>
 
 
-                  <div className="project-info">
+                <div className="project-info">
 
-                    <div>
+                  <div>
 
-                      <p className="project-category">
-                        {project.category.toUpperCase()}
-                      </p>
+                    <p className="project-category">
+                      {project.category.toUpperCase()}
+                    </p>
 
-                      <h3>
-                        {project.title}
-                      </h3>
-
-                    </div>
-
-
-                    <ArrowUpRight
-                      size={20}
-                      strokeWidth={1.5}
-                    />
+                    <h3>
+                      {project.title}
+                    </h3>
 
                   </div>
 
-                </article>
 
-              )
-            )}
+                  <ArrowUpRight
+                    size={20}
+                    strokeWidth={1.5}
+                  />
+
+                </div>
+
+              </article>
+
+            ))}
 
           </div>
 
@@ -751,7 +719,6 @@ function App() {
           >
 
             <div
-              ref={carouselTrackRef}
               className={`testimonial-track ${
                 isAnimating
                   ? 'testimonial-track-animated'
@@ -760,8 +727,7 @@ function App() {
               style={{
                 transform:
                   `translate3d(-${
-                    currentIndex *
-                    step
+                    currentIndex * step
                   }px, 0, 0)`,
               }}
               onTransitionEnd={
@@ -770,10 +736,7 @@ function App() {
             >
 
               {clonedTestimonials.map(
-                (
-                  testimonial,
-                  index
-                ) => (
+                (testimonial, index) => (
 
                   <article
                     key={`${testimonial.name}-${index}`}
@@ -828,14 +791,9 @@ function App() {
           </div>
 
 
-          {/* =================================================
-              TESTIMONIAL CONTROLS
-          ================================================= */}
+          {/* TESTIMONIAL CONTROLS */}
 
           <div className="testimonial-navigation">
-
-
-            {/* PREVIOUS */}
 
             <button
               type="button"
@@ -849,15 +807,10 @@ function App() {
             </button>
 
 
-            {/* DOTS */}
-
             <div className="testimonial-dots">
 
               {testimonials.map(
-                (
-                  _,
-                  index
-                ) => (
+                (_, index) => (
 
                   <button
                     key={index}
@@ -866,15 +819,12 @@ function App() {
                       index + 1
                     }`}
                     className={`testimonial-dot ${
-                      normalizedRealIndex ===
-                      index
+                      normalizedRealIndex === index
                         ? 'active'
                         : ''
                     }`}
                     onClick={() =>
-                      goToTestimonial(
-                        index
-                      )
+                      goToTestimonial(index)
                     }
                   />
 
@@ -883,8 +833,6 @@ function App() {
 
             </div>
 
-
-            {/* NEXT */}
 
             <button
               type="button"
@@ -903,7 +851,7 @@ function App() {
 
 
         {/* =================================================
-            ABOUT
+            ABOUT + CONTACT
         ================================================= */}
 
         <section
@@ -911,27 +859,219 @@ function App() {
           className="about-section"
         >
 
-          <div className="section-heading">
+          <div className="about-frame">
 
-            <p className="eyebrow">
-              ABOUT
-            </p>
+            {/* =============================================
+                LEFT CONTENT
+            ============================================= */}
 
-            <h2>
-              Behind the edits.
-            </h2>
+            <div className="about-copy">
+
+              <p className="about-eyebrow">
+                ABOUT / LUCY
+              </p>
+
+
+              <h2 className="about-title">
+                Behind the
+                <br />
+                edits.
+              </h2>
+
+
+              <p className="about-description">
+                I’m a video editor focused on turning
+                raw footage into edits that feel
+                intentional, engaging and easy to watch.
+                My approach is built around story,
+                rhythm and visual identity — making
+                every cut serve the bigger idea behind
+                the video.
+              </p>
+
+
+              <div className="about-principles">
+
+                <span className="principle-line" />
+
+                <span>
+                  STORY / RHYTHM / VISUAL IDENTITY
+                </span>
+
+              </div>
+
+
+              {/* STATS */}
+
+              <div className="about-stats">
+
+                <div className="about-stat">
+
+                  <strong>
+                    3+
+                  </strong>
+
+                  <span>
+                    YEARS EDITING
+                  </span>
+
+                </div>
+
+
+                <div className="about-stat">
+
+                  <strong>
+                    50+
+                  </strong>
+
+                  <span>
+                    PROJECTS
+                  </span>
+
+                </div>
+
+
+                <div className="about-stat">
+
+                  <strong>
+                    100%
+                  </strong>
+
+                  <span>
+                    COMMITMENT
+                  </span>
+
+                </div>
+
+              </div>
+
+
+
+
+            </div>
+
+
+            {/* =============================================
+                RIGHT DYNAMIC VISUAL
+            ============================================= */}
+
+            <div
+              className="about-visual"
+              aria-hidden="true"
+            >
+
+              <div className="visual-grid" />
+
+
+              <div className="orbit orbit-one" />
+              <div className="orbit orbit-two" />
+              <div className="orbit orbit-three" />
+
+
+              <div className="orbit-line orbit-line-one" />
+              <div className="orbit-line orbit-line-two" />
+
+
+              {/* FILM STRIP */}
+
+              <div className="film-scene">
+
+                <div className="film-strip">
+
+                  {[
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                  ].map(frame => (
+
+                    <div
+                      className="film-frame"
+                      key={frame}
+                    >
+
+                      <div className="frame-image">
+                        <span>
+                          {String(
+                            frame
+                          ).padStart(
+                            2,
+                            '0'
+                          )}
+                        </span>
+                      </div>
+
+                    </div>
+
+                  ))}
+
+                </div>
+
+              </div>
+
+
+              {/* GLOWING LIGHT */}
+
+              <div className="visual-glow" />
+
+
+              <div className="visual-particles">
+
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+
+              </div>
+
+
+              {/* LABELS */}
+
+              <span className="visual-label label-ideas">
+                IDEAS
+              </span>
+
+              <span className="visual-label label-frames">
+                FRAMES
+              </span>
+
+              <span className="visual-label label-stories">
+                STORIES
+              </span>
+
+              <span className="visual-label label-impact">
+                IMPACT
+              </span>
+
+
+              <span className="visual-dot dot-one" />
+              <span className="visual-dot dot-two" />
+              <span className="visual-dot dot-three" />
+              <span className="visual-dot dot-four" />
+
+
+              <div className="visual-center-line" />
+
+
+              <div className="visual-caption">
+                <em>More</em>
+                <em>than</em>
+                <em>cuts.</em>
+
+                <span />
+              </div>
+
+            </div>
 
           </div>
 
 
-          <div className="about-content">
-
-            <p>
-              About content will be managed
-              through the CMS.
-            </p>
-
-          </div>
 
         </section>
 
@@ -941,65 +1081,105 @@ function App() {
         ================================================= */}
 
         <section
-          id="contact"
+          id="about-contact"
           className="contact-section"
         >
+          <div className="contact-frame">
 
-          <div className="section-heading">
+            <div className="contact-ornament contact-ornament-left" aria-hidden="true">
+              <span>GOOD</span>
+              <span>IDEAS</span>
+              <span>BETTER</span>
+              <span>EDITS</span>
+            </div>
 
-            <p className="eyebrow">
-              CONTACT
-            </p>
+            <div className="contact-ornament contact-ornament-right" aria-hidden="true">
+              <span>LET’S</span>
+              <span>MAKE</span>
+              <span>IT</span>
+              <span>HAPPEN</span>
+            </div>
 
-            <h2>
-              Let's make something.
-            </h2>
+            <div className="contact-header">
+              <p className="contact-eyebrow">CONTACT</p>
+              <span className="contact-header-line" aria-hidden="true" />
+              <h2 className="contact-title">
+                Let’s create <em>something.</em>
+              </h2>
+              <p className="contact-tagline">
+                IDEAS <span>×</span> STORIES <span>×</span> BETTER VIDEOS
+              </p>
+            </div>
 
-          </div>
+            <div className="contact-grid">
 
+              <div className="contact-column contact-social-column">
+                <p className="contact-column-label">SOCIALS</p>
 
-          <div className="contact-content">
+                <div className="contact-social-links">
+                  <a href="https://youtube.com/" target="_blank" rel="noreferrer" aria-label="YouTube">
+                    <img src="https://cdn.simpleicons.org/youtube/ffffff" alt="" />
+                  </a>
+                  <a href="https://instagram.com/" target="_blank" rel="noreferrer" aria-label="Instagram">
+                    <img src="https://cdn.simpleicons.org/instagram/ffffff" alt="" />
+                  </a>
+                  <a href="https://discord.com/" target="_blank" rel="noreferrer" aria-label="Discord">
+                    <img src="https://cdn.simpleicons.org/discord/ffffff" alt="" />
+                  </a>
+                  <a href="https://x.com/" target="_blank" rel="noreferrer" aria-label="X">
+                    <img src="https://cdn.simpleicons.org/x/ffffff" alt="" />
+                  </a>
+                </div>
 
-            <p>
-              Contact information and
-              platforms will be managed
-              through the CMS.
-            </p>
+                <p className="contact-column-note">Let’s stay connected.</p>
+              </div>
 
+              <div className="contact-column contact-email-column">
+                <p className="contact-column-label">EMAIL</p>
 
-            <div className="contact-links">
+                <a
+                  className="contact-email-button"
+                  href="mailto:hello@example.com?subject=Project%20Inquiry"
+                >
+                  <span className="contact-mail-icon" aria-hidden="true">
+                    <Mail size={20} strokeWidth={1.5} />
+                  </span>
+                  <span>SEND ME AN EMAIL</span>
+                  <ArrowUpRight size={20} strokeWidth={1.5} />
+                </a>
 
-              <a href="#contact">
-                <Camera size={18} />
-                Instagram
-                <ArrowUpRight size={16} />
-              </a>
+                <p className="contact-column-note">Open for new projects and ideas.</p>
+              </div>
 
+              <div className="contact-column contact-software-column">
+                <p className="contact-column-label">SOFTWARE I USE</p>
 
-              <a href="#contact">
-                <Play size={18} />
-                YouTube
-                <ArrowUpRight size={16} />
-              </a>
+                <div className="contact-software-list">
+                  <div className="contact-software-item" title="Adobe Premiere Pro">
+                    <img src="https://cdn.simpleicons.org/adobepremierepro/9999ff" alt="Adobe Premiere Pro" />
+                  </div>
+                  <div className="contact-software-item" title="Adobe After Effects">
+                    <img src="https://cdn.simpleicons.org/adobeaftereffects/9999ff" alt="Adobe After Effects" />
+                  </div>
+                  <div className="contact-software-item" title="DaVinci Resolve">
+                    <img src="https://cdn.simpleicons.org/davinciresolve/ffffff" alt="DaVinci Resolve" />
+                  </div>
+                </div>
 
-
-              <a href="#contact">
-                <MessageCircle size={18} />
-                Discord
-                <ArrowUpRight size={16} />
-              </a>
-
-
-              <a href="#contact">
-                <Mail size={18} />
-                Email
-                <ArrowUpRight size={16} />
-              </a>
+                <p className="contact-column-note">The right tools for better stories.</p>
+              </div>
 
             </div>
 
-          </div>
+            <div className="contact-bottom">
+              <span>VIDEO EDITOR</span>
+              <div className="contact-bottom-line" aria-hidden="true" />
+              <span className="contact-bottom-name">LUCY</span>
+              <div className="contact-bottom-line" aria-hidden="true" />
+              <span>EDIT · CREATE · INSPIRE</span>
+            </div>
 
+          </div>
         </section>
 
       </main>
@@ -1044,21 +1224,21 @@ function App() {
 
         <div className="footer-bottom">
 
-          <span>
+          <a href="#about-contact">
             Instagram ↗
-          </span>
+          </a>
 
-          <span>
+          <a href="#about-contact">
             YouTube ↗
-          </span>
+          </a>
 
-          <span>
+          <a href="#about-contact">
             Discord ↗
-          </span>
+          </a>
 
-          <span>
+          <a href="mailto:hello@example.com">
             Email ↗
-          </span>
+          </a>
 
           <span>
             © {new Date().getFullYear()} LUCY.
